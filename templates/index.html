@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <style>
+        body { background-color: #333; color: white; font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 50px auto; }
+        .chat-box { border: 1px solid white; padding: 10px; height: 400px; overflow-y: scroll; }
+        input { width: 80%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Chatbot</h1>
+        <div class="chat-box" id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            if (!userInput) return;
+
+            updateChatBox('User', userInput);
+            document.getElementById('user-input').value = '';
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userInput })
+            });
+
+            const data = await response.json();
+            updateChatBox('AI', data.response);
+
+            const audio = new Audio(data.audio_url);
+            audio.play();
+        }
+
+        function updateChatBox(sender, message) {
+            const chatBox = document.getElementById('chat-box');
+            const newMessage = document.createElement('div');
+            newMessage.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatBox.appendChild(newMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
